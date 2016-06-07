@@ -1,0 +1,12 @@
+/JUCE
+/JuceLibraryCode
+
+.DS_Store
+*.swp
+*.app
+*.o
+*.a
+
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+
