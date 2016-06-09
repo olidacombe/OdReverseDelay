@@ -82,7 +82,7 @@ void OdReverseDelayAudioProcessor::prepareToPlay (double sampleRate, int samples
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    delayBufferFloat.setSize(2, 12000);
+    delayBufferFloat.setSize(2, 120000);
 }
 
 void OdReverseDelayAudioProcessor::releaseResources()
@@ -151,6 +151,7 @@ void OdReverseDelayAudioProcessor::applyDelay(AudioBuffer<FloatType>& buffer, Au
     const int numSamples = buffer.getNumSamples();
     const float delayLevel = 0.4;
     
+    const int delaySize = delayBuffer.getNumSamples();
     int delayPos = 0;
     
     for(int channel = 0; channel < getTotalNumInputChannels(); ++channel) {
@@ -159,12 +160,14 @@ void OdReverseDelayAudioProcessor::applyDelay(AudioBuffer<FloatType>& buffer, Au
         delayPos = delayPosition;
         
         for(int i=0; i<numSamples; ++i) {
+            const int delayAntiPos = delaySize - 1 - delayPos;
             const FloatType in = channelData[i];
             channelData[i] += delayData[delayPos];
-            delayData[delayPos] = (delayData[delayPos] + in) * delayLevel;
+            delayData[delayAntiPos] = (delayData[delayAntiPos] + in) * delayLevel;
             
-            if (++delayPos >= delayBuffer.getNumSamples())
+            if (++delayPos >= delaySize) {
                 delayPos = 0;
+            }
         }
     }
     
