@@ -14,7 +14,8 @@
 
 //==============================================================================
 OdReverseDelayAudioProcessor::OdReverseDelayAudioProcessor()
-    :   ctsDelayParam(nullptr)
+    :   ctsDelayParam(nullptr),
+        delayPosition(0)
 {
     addParameter(ctsDelayParam = new AudioParameterFloat("ctsDelay", "Continuous Delay Time", 0.0f, 1.0f, 0.5f));
 }
@@ -81,6 +82,7 @@ void OdReverseDelayAudioProcessor::prepareToPlay (double sampleRate, int samples
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    delayBufferFloat.setSize(2, 12000);
 }
 
 void OdReverseDelayAudioProcessor::releaseResources()
@@ -114,7 +116,9 @@ bool OdReverseDelayAudioProcessor::setPreferredBusArrangement (bool isInput, int
 }
 #endif
 
-void OdReverseDelayAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
+
+template <typename FloatType>
+void OdReverseDelayAudioProcessor::process (AudioBuffer<FloatType>& buffer, MidiBuffer& midiMessages, AudioBuffer<FloatType>& delayBuffer)
 {
     const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
@@ -130,12 +134,15 @@ void OdReverseDelayAudioProcessor::processBlock (AudioSampleBuffer& buffer, Midi
 
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
+    /*
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         float* channelData = buffer.getWritePointer (channel);
 
         // ..do something to the data...
     }
+    */
+    applyDelay(buffer, delayBuffer);
 }
 
 template<typename FloatType>
@@ -148,8 +155,20 @@ void OdReverseDelayAudioProcessor::applyDelay(AudioBuffer<FloatType>& buffer, Au
     
     for(int channel = 0; channel < getTotalNumInputChannels(); ++channel) {
         FloatType* const channelData = buffer.getWritePointer(channel);
-        //FloatType* const delayData = 
+        FloatType* const delayData = delayBuffer.getWritePointer (jmin (channel, delayBuffer.getNumChannels() - 1));
+        delayPos = delayPosition;
+        
+        for(int i=0; i<numSamples; ++i) {
+            const FloatType in = channelData[i];
+            channelData[i] += delayData[delayPos];
+            delayData[delayPos] = (delayData[delayPos] + in) * delayLevel;
+            
+            if (++delayPos >= delayBuffer.getNumSamples())
+                delayPos = 0;
+        }
     }
+    
+    delayPosition = delayPos;
 }
 
 //==============================================================================

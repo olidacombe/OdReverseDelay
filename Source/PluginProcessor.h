@@ -32,7 +32,17 @@ public:
     bool setPreferredBusArrangement (bool isInput, int bus, const AudioChannelSet& preferredSet) override;
    #endif
 
-    void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
+    void processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override
+    {
+        jassert (! isUsingDoublePrecision());
+        process (buffer, midiMessages, delayBufferFloat);
+    }
+
+    void processBlock (AudioBuffer<double>& buffer, MidiBuffer& midiMessages) override
+    {
+        jassert (isUsingDoublePrecision());
+        process (buffer, midiMessages, delayBufferDouble);
+    }
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
@@ -59,10 +69,12 @@ public:
     AudioParameterFloat* ctsDelayParam;
 private:
     template <typename FloatType>
+    void process(AudioBuffer<FloatType>& buffer, MidiBuffer& midiMessages, AudioBuffer<FloatType>& delayBuffer);
+    template <typename FloatType>
     void applyDelay(AudioBuffer<FloatType>&, AudioBuffer<FloatType>& delayBuffer);
     
     AudioBuffer<float> delayBufferFloat;
-    //AudioBuffer<double> delayBufferDouble;
+    AudioBuffer<double> delayBufferDouble;
     int delayPosition;
     
     //==============================================================================
