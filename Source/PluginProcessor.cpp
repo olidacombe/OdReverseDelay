@@ -82,7 +82,7 @@ void OdReverseDelayAudioProcessor::prepareToPlay (double sampleRate, int samples
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    delayBufferFloat.setSize(2, 120000);
+    delayBufferFloat.setSize(2, 131072);
 }
 
 void OdReverseDelayAudioProcessor::releaseResources()
