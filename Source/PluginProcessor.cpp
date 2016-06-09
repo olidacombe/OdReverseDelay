@@ -138,6 +138,20 @@ void OdReverseDelayAudioProcessor::processBlock (AudioSampleBuffer& buffer, Midi
     }
 }
 
+template<typename FloatType>
+void OdReverseDelayAudioProcessor::applyDelay(AudioBuffer<FloatType>& buffer, AudioBuffer<FloatType>& delayBuffer)
+{
+    const int numSamples = buffer.getNumSamples();
+    const float delayLevel = 0.4;
+    
+    int delayPos = 0;
+    
+    for(int channel = 0; channel < getTotalNumInputChannels(); ++channel) {
+        FloatType* const channelData = buffer.getWritePointer(channel);
+        //FloatType* const delayData = 
+    }
+}
+
 //==============================================================================
 bool OdReverseDelayAudioProcessor::hasEditor() const
 {

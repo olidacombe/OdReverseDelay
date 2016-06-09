@@ -58,6 +58,13 @@ public:
 
     AudioParameterFloat* ctsDelayParam;
 private:
+    template <typename FloatType>
+    void applyDelay(AudioBuffer<FloatType>&, AudioBuffer<FloatType>& delayBuffer);
+    
+    AudioBuffer<float> delayBufferFloat;
+    //AudioBuffer<double> delayBufferDouble;
+    int delayPosition;
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OdReverseDelayAudioProcessor)
 };
