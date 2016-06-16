@@ -67,7 +67,9 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    AudioParameterFloat* ctsDelayParam;
+    AudioParameterFloat *ctsDelayParameter, *feedbackParameter;
+    
+    
 private:
     template <typename FloatType>
     void process(AudioBuffer<FloatType>& buffer, MidiBuffer& midiMessages, AudioBuffer<FloatType>& delayBuffer);
@@ -76,6 +78,9 @@ private:
     
     ThreadSafeLinearSmoothedValue<float> normalizedDelayLengthFloat;
     ThreadSafeLinearSmoothedValue<float> normalizedDelayLengthDouble;
+    ThreadSafeLinearSmoothedValue<float> feedbackParameterFloat;
+    ThreadSafeLinearSmoothedValue<float> feedbackParameterDouble;
+    
     
     AudioBuffer<float> delayBufferFloat;
     AudioBuffer<double> delayBufferDouble;

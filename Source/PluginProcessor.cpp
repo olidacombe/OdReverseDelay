@@ -14,10 +14,11 @@
 
 //==============================================================================
 OdReverseDelayAudioProcessor::OdReverseDelayAudioProcessor()
-    :   ctsDelayParam(nullptr),
+    :   ctsDelayParameter(nullptr),
+        feedbackParameter(nullptr),
         delayPosition(0)
 {
-    addParameter(ctsDelayParam = new AudioParameterFloat("ctsDelay", "Continuous Delay Time", 0.0f, 1.0f, 0.5f));
+    addParameter(ctsDelayParameter = new AudioParameterFloat("ctsDelay", "Continuous Delay Time", 0.0f, 1.0f, 0.5f));
 }
 
 OdReverseDelayAudioProcessor::~OdReverseDelayAudioProcessor()

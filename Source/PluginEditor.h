@@ -35,7 +35,7 @@ private:
     // access the processor object that created it.
     OdReverseDelayAudioProcessor& processor;
 
-    ScopedPointer<ParameterSlider> ctsDelaySlider;
+    ScopedPointer<ParameterSlider> ctsDelaySlider, feedbackSlider;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OdReverseDelayAudioProcessorEditor)
 };

@@ -55,7 +55,9 @@ public:
 OdReverseDelayAudioProcessorEditor::OdReverseDelayAudioProcessorEditor (OdReverseDelayAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p)
 {
-    addAndMakeVisible(ctsDelaySlider = new ParameterSlider(*processor.ctsDelayParam));
+    addAndMakeVisible(feedbackSlider = new ParameterSlider(*processor.feedbackParameter));
+    feedbackSlider->setSliderStyle(Slider::Rotary);
+    addAndMakeVisible(ctsDelaySlider = new ParameterSlider(*processor.ctsDelayParameter));
     ctsDelaySlider->setSliderStyle(Slider::Rotary);
     
     // Make sure that before the constructor has finished, you've set the
@@ -86,4 +88,5 @@ void OdReverseDelayAudioProcessorEditor::resized()
     Rectangle<int> r (getLocalBounds().reduced(8));
     Rectangle<int> sliderArea(r.removeFromTop(50));
     ctsDelaySlider->setBounds(sliderArea.removeFromLeft(jmin(180, sliderArea.getWidth() / 2)));
+    feedbackSlider->setBounds(sliderArea.removeFromLeft(jmin(180, sliderArea.getWidth() / 2)));
 }
