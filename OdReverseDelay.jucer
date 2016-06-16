@@ -12,6 +12,8 @@
               jucerVersion="4.2.1">
   <MAINGROUP id="BcmwmQ" name="OdReverseDelay">
     <GROUP id="{C5F34C6A-200F-392E-E29C-D9F979F416A9}" name="Source">
+      <FILE id="DVu2Ln" name="ThreadSafeLinearSmoothedValue.h" compile="0"
+            resource="0" file="Source/ThreadSafeLinearSmoothedValue.h"/>
       <FILE id="G8imJe" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="Qg2Dvb" name="PluginProcessor.h" compile="0" resource="0"

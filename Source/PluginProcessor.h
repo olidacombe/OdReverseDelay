@@ -12,6 +12,7 @@
 #define PLUGINPROCESSOR_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "ThreadSafeLinearSmoothedValue.h"
 
 
 //==============================================================================
@@ -72,6 +73,9 @@ private:
     void process(AudioBuffer<FloatType>& buffer, MidiBuffer& midiMessages, AudioBuffer<FloatType>& delayBuffer);
     template <typename FloatType>
     void applyDelay(AudioBuffer<FloatType>&, AudioBuffer<FloatType>& delayBuffer);
+    
+    ThreadSafeLinearSmoothedValue<float> normalizedDelayLengthFloat;
+    ThreadSafeLinearSmoothedValue<float> normalizedDelayLengthDouble;
     
     AudioBuffer<float> delayBufferFloat;
     AudioBuffer<double> delayBufferDouble;
