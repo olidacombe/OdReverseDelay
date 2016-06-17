@@ -10,6 +10,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "AudioParameterAtomicFloat.h"
 
 
 //==============================================================================
@@ -18,8 +19,8 @@ OdReverseDelayAudioProcessor::OdReverseDelayAudioProcessor()
         feedbackParameter(nullptr),
         delayPosition(0)
 {
-    addParameter(ctsDelayParameter = new AudioParameterFloat("continuousDelay", "Continuous Delay Time", 0.0f, 1.0f, 0.5f));
-    addParameter(feedbackParameter = new AudioParameterFloat("feedback", "Feedback", 0.0f, 1.0f, 0.4f));
+    addParameter(ctsDelayParameter = new AudioParameterAtomicFloat("continuousDelay", "Continuous Delay Time", 0.0f, 1.0f, 0.5f));
+    addParameter(feedbackParameter = new AudioParameterAtomicFloat("feedback", "Feedback", 0.0f, 1.0f, 0.4f));
 }
 
 OdReverseDelayAudioProcessor::~OdReverseDelayAudioProcessor()

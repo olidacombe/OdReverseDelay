@@ -13,6 +13,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "ThreadSafeLinearSmoothedValue.h"
+#include "AudioParameterAtomicFloat.h"
 
 
 //==============================================================================
@@ -67,7 +68,7 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    AudioParameterFloat *ctsDelayParameter, *feedbackParameter;
+    AudioParameterAtomicFloat *ctsDelayParameter, *feedbackParameter;
     
     
 private:
