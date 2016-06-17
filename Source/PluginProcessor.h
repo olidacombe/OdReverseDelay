@@ -84,7 +84,11 @@ private:
     
     AudioBuffer<float> delayBufferFloat;
     AudioBuffer<double> delayBufferDouble;
+    
+    double sampleRate;
+    int delayLengthSamples;
     int delayPosition;
+    const int maxDelayBufferSize = 131072;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OdReverseDelayAudioProcessor)

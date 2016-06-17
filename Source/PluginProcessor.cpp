@@ -18,7 +18,8 @@ OdReverseDelayAudioProcessor::OdReverseDelayAudioProcessor()
         feedbackParameter(nullptr),
         delayPosition(0)
 {
-    addParameter(ctsDelayParameter = new AudioParameterFloat("ctsDelay", "Continuous Delay Time", 0.0f, 1.0f, 0.5f));
+    addParameter(ctsDelayParameter = new AudioParameterFloat("continuousDelay", "Continuous Delay Time", 0.0f, 1.0f, 0.5f));
+    addParameter(feedbackParameter = new AudioParameterFloat("feedback", "Feedback", 0.0f, 1.0f, 0.4f));
 }
 
 OdReverseDelayAudioProcessor::~OdReverseDelayAudioProcessor()
@@ -83,6 +84,10 @@ void OdReverseDelayAudioProcessor::prepareToPlay (double sampleRate, int samples
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    if(delayBufferFloat.getNumSamples() < samplesPerBlock) {
+        delayBufferFloat.setSize(2, samplesPerBlock);
+    }
+    // this will go
     delayBufferFloat.setSize(2, 131072);
 }
 
@@ -150,7 +155,7 @@ template<typename FloatType>
 void OdReverseDelayAudioProcessor::applyDelay(AudioBuffer<FloatType>& buffer, AudioBuffer<FloatType>& delayBuffer)
 {
     const int numSamples = buffer.getNumSamples();
-    const float delayLevel = 0.4;
+    const float delayLevel = feedbackParameter->get();
     
     const int delaySize = delayBuffer.getNumSamples();
     int delayPos = 0;
