@@ -154,8 +154,11 @@ void OdReverseDelayAudioProcessor::process (AudioBuffer<FloatType>& buffer, Midi
 template<typename FloatType>
 void OdReverseDelayAudioProcessor::applyDelay(AudioBuffer<FloatType>& buffer, AudioBuffer<FloatType>& delayBuffer)
 {
+    
     const int numSamples = buffer.getNumSamples();
     const float delayLevel = feedbackParameter->get();
+    // maybe we should smooth these parameters here
+    // 
     
     const int delaySize = delayBuffer.getNumSamples();
     int delayPos = 0;
