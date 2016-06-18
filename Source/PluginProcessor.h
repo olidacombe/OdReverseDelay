@@ -68,7 +68,7 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    AudioParameterAtomicFloat *ctsDelayParameter, *feedbackParameter;
+    AudioParameterFloat *ctsDelayParameter, *feedbackParameter;
     
     
 private:

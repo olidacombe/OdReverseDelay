@@ -15,18 +15,19 @@
 class AudioParameterAtomicFloat : public AudioParameterFloat
 {
 public:
-AudioParameterAtomicFloat (String parameterID, String name,
-                         NormalisableRange<float> normalisableRange,
-                         float defaultValue) : AudioParameterFloat (parameterID, name,
-                         normalisableRange,
-                         defaultValue) {}
-AudioParameterAtomicFloat (String parameterID, String name,
-                         float minValue,
-                         float maxValue,
-                         float defaultValue) : AudioParameterFloat (parameterID, name, minValue, maxValue, defaultValue) {}
+    AudioParameterAtomicFloat (String parameterID, String name,
+         NormalisableRange<float> normalisableRange,
+         float defaultValue) : AudioParameterFloat (parameterID, name,
+         normalisableRange,
+         defaultValue) {}
+    AudioParameterAtomicFloat (String parameterID, String name,
+         float minValue,
+         float maxValue,
+         float defaultValue) : AudioParameterFloat (parameterID, name, minValue, maxValue, defaultValue) {}
 
     float get() const noexcept { return value.load(); }
     operator float() const noexcept { return value.load(); }
+    AudioParameterFloat& operator = (float newValue) {  }
 private:
     std::atomic<float> value;
 };
