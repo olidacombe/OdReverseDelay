@@ -16,8 +16,7 @@
 //==============================================================================
 OdReverseDelayAudioProcessor::OdReverseDelayAudioProcessor()
     :   ctsDelayParameter(nullptr),
-        feedbackParameter(nullptr),
-        delayPosition(0)
+        feedbackParameter(nullptr)
 {
     addParameter(ctsDelayParameter = new AudioParameterFloat("continuousDelay", "Continuous Delay Time", 0.0f, 1.0f, 0.5f));
     addParameter(feedbackParameter = new AudioParameterFloat("feedback", "Feedback", 0.0f, 1.0f, 0.4f));
@@ -81,10 +80,10 @@ void OdReverseDelayAudioProcessor::changeProgramName (int index, const String& n
 }
 
 //==============================================================================
-void OdReverseDelayAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void OdReverseDelayAudioProcessor::prepareToPlay (double newSampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    sampleRate=newSampleRate;
+    
     if(delayBufferFloat.getNumSamples() < samplesPerBlock) {
         delayBufferFloat.setSize(2, samplesPerBlock);
     }
@@ -149,7 +148,21 @@ void OdReverseDelayAudioProcessor::process (AudioBuffer<FloatType>& buffer, Midi
         // ..do something to the data...
     }
     */
+    // check for a change of delay length - probably do this in gui thread later
+    // and just do a quick comparison here with a current ctsDelayParamter->getValue
+    normalizedDelayLength = ctsDelayParameter->get();
+    if( normalizedDelayLengthToSamples(normalizedDelayLength) != delayLengthSamples ) {
+        // do stretch
+        
+        delayLengthSamples = normalizedDelayLengthToSamples(normalizedDelayLength);
+    }
     applyDelay(buffer, delayBuffer);
+}
+
+template<typename FloatType>
+const int OdReverseDelayAudioProcessor::normalizedDelayLengthToSamples(const FloatType &normDelayLength) {
+    const FloatType maxDelaySeconds = 2.0;
+    return int(maxDelaySeconds * normDelayLength * sampleRate);
 }
 
 template<typename FloatType>
@@ -171,9 +184,11 @@ void OdReverseDelayAudioProcessor::applyDelay(AudioBuffer<FloatType>& buffer, Au
         
         for(int i=0; i<numSamples; ++i) {
             const int delayAntiPos = delaySize - 1 - delayPos;
-            const FloatType in = channelData[i];
-            channelData[i] += delayData[delayPos];
-            delayData[delayAntiPos] = (delayData[delayAntiPos] + in) * delayLevel;
+            //const FloatType in = channelData[i];
+            channelData[i] += delayData[delayPos] * delayLevel;
+            delayData[delayAntiPos] = delayData[delayAntiPos] + channelData[i];
+            //delayData[delayAntiPos] = (delayData[delayAntiPos] + channelData[i]) * delayLevel;
+            //delayData[delayAntiPos] = (delayData[delayAntiPos] + in) * delayLevel;
             
             if (++delayPos >= delaySize) {
                 delayPos = 0;

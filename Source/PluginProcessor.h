@@ -76,6 +76,8 @@ private:
     void process(AudioBuffer<FloatType>& buffer, MidiBuffer& midiMessages, AudioBuffer<FloatType>& delayBuffer);
     template <typename FloatType>
     void applyDelay(AudioBuffer<FloatType>&, AudioBuffer<FloatType>& delayBuffer);
+    template <typename FloatType>
+    const int normalizedDelayLengthToSamples(const FloatType& delayLength);
     
     ThreadSafeLinearSmoothedValue<float> normalizedDelayLengthFloat;
     ThreadSafeLinearSmoothedValue<float> normalizedDelayLengthDouble;
@@ -87,6 +89,7 @@ private:
     AudioBuffer<double> delayBufferDouble;
     
     double sampleRate;
+    float normalizedDelayLength;
     int delayLengthSamples;
     int delayPosition;
     const int maxDelayBufferSize = 131072;

@@ -27,7 +27,7 @@ public:
 
     float get() const noexcept { return value.load(); }
     operator float() const noexcept { return value.load(); }
-    AudioParameterFloat& operator = (float newValue) {  }
+    //AudioParameterFloat& operator = (float newValue) {  }
 private:
     std::atomic<float> value;
 };
