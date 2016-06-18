@@ -16,7 +16,8 @@
 //==============================================================================
 OdReverseDelayAudioProcessor::OdReverseDelayAudioProcessor()
     :   ctsDelayParameter(nullptr),
-        feedbackParameter(nullptr)
+        feedbackParameter(nullptr),
+        delayLengthSamples(1)
 {
     addParameter(ctsDelayParameter = new AudioParameterFloat("continuousDelay", "Continuous Delay Time", 0.0f, 1.0f, 0.5f));
     addParameter(feedbackParameter = new AudioParameterFloat("feedback", "Feedback", 0.0f, 1.0f, 0.4f));
@@ -151,18 +152,41 @@ void OdReverseDelayAudioProcessor::process (AudioBuffer<FloatType>& buffer, Midi
     // check for a change of delay length - probably do this in gui thread later
     // and just do a quick comparison here with a current ctsDelayParamter->getValue
     normalizedDelayLength = ctsDelayParameter->get();
-    if( normalizedDelayLengthToSamples(normalizedDelayLength) != delayLengthSamples ) {
+    int newDelayLengthSamples = normalizedDelayLengthToSamples(normalizedDelayLength);
+    if( newDelayLengthSamples != delayLengthSamples ) {
         // do stretch
         
+        dillateBuffer(delayBuffer, newDelayLengthSamples);
+        
+        // check this!
+        delayPosition *= (float)newDelayLengthSamples/(float)delayLengthSamples;
+        //delayPosition = 0;
+        /*delayPosition *= newDelayLengthSamples;
+        delayPosition /= delayLengthSamples;*/
         delayLengthSamples = normalizedDelayLengthToSamples(normalizedDelayLength);
     }
     applyDelay(buffer, delayBuffer);
 }
 
 template<typename FloatType>
+void OdReverseDelayAudioProcessor::dillateBuffer(AudioBuffer<FloatType>& buffer, const int newLength)
+{
+    /*
+    My initial idea is, when scaling from N+1 samples to M+1 samples, a[] -> b[].
+    b[0]=a[0], b[M+1]=a[N+1]
+    and for 0<i<=M:
+        b[i] =  { (iN % M)a[iN/M] + (M - (iN % M))a[iN/M + 1] } / M
+    */
+    if(buffer.getNumSamples() < newLength) {
+        buffer.setSize(buffer.getNumChannels(), exp2((int)log2(newLength) + 1), true);
+    }
+    
+}
+
+template<typename FloatType>
 const int OdReverseDelayAudioProcessor::normalizedDelayLengthToSamples(const FloatType &normDelayLength) {
     const FloatType maxDelaySeconds = 2.0;
-    return int(maxDelaySeconds * normDelayLength * sampleRate);
+    return maxDelaySeconds * normDelayLength * sampleRate;
 }
 
 template<typename FloatType>

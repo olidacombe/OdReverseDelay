@@ -74,10 +74,15 @@ public:
 private:
     template <typename FloatType>
     void process(AudioBuffer<FloatType>& buffer, MidiBuffer& midiMessages, AudioBuffer<FloatType>& delayBuffer);
+    
     template <typename FloatType>
     void applyDelay(AudioBuffer<FloatType>&, AudioBuffer<FloatType>& delayBuffer);
+    
     template <typename FloatType>
     const int normalizedDelayLengthToSamples(const FloatType& delayLength);
+    
+    template <typename FloatType>
+    void dillateBuffer(AudioBuffer<FloatType>& buffer, const int newLength);
     
     ThreadSafeLinearSmoothedValue<float> normalizedDelayLengthFloat;
     ThreadSafeLinearSmoothedValue<float> normalizedDelayLengthDouble;
