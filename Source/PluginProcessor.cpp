@@ -180,9 +180,11 @@ void OdReverseDelayAudioProcessor::dillateBuffer(AudioBuffer<FloatType>& buffer,
     and for 0<i<=M:
         b[i] =  { (iN % M)a[iN/M] + (M - (iN % M))a[iN/M + 1] } / M
     */
+    /*
     if(buffer.getNumSamples() < newLength) {
         buffer.setSize(buffer.getNumChannels(), exp2((int)log2(newLength) + 1), true);
     }
+    */
     
 }
 
@@ -199,16 +201,17 @@ void OdReverseDelayAudioProcessor::applyDelay(AudioBuffer<FloatType>& buffer, Au
     
     const int numSamples = buffer.getNumSamples();
     const float delayLevel = feedbackParameter->get();
+    const int initialDelayPos = delayPosition;
     // maybe we should smooth these parameters here
     // 
     
-    const int delaySize = delayBuffer.getNumSamples();
-    int delayPos = 0;
+    const int delaySize = delayLengthSamples;
+    int delayPos;
     
     for(int channel = 0; channel < getTotalNumInputChannels(); ++channel) {
         FloatType* const channelData = buffer.getWritePointer(channel);
         FloatType* const delayData = delayBuffer.getWritePointer (jmin (channel, delayBuffer.getNumChannels() - 1));
-        delayPos = delayPosition;
+        delayPos = initialDelayPos;
         
         for(int i=0; i<numSamples; ++i) {
             const int delayAntiPos = delaySize - 1 - delayPos;
