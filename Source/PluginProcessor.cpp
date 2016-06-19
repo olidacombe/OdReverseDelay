@@ -216,8 +216,8 @@ void OdReverseDelayAudioProcessor::applyDelay(AudioBuffer<FloatType>& buffer, Au
         for(int i=0; i<numSamples; ++i) {
             const int delayAntiPos = delaySize - 1 - delayPos;
             //const FloatType in = channelData[i];
-            channelData[i] += delayData[delayPos] * delayLevel;
-            delayData[delayAntiPos] = delayData[delayAntiPos] + channelData[i];
+            delayData[delayAntiPos] = delayData[delayAntiPos] * delayLevel + channelData[i];
+            channelData[i] += delayData[delayPos];
             //delayData[delayAntiPos] = (delayData[delayAntiPos] + channelData[i]) * delayLevel;
             //delayData[delayAntiPos] = (delayData[delayAntiPos] + in) * delayLevel;
             
