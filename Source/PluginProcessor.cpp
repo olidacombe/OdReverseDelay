@@ -83,13 +83,19 @@ void OdReverseDelayAudioProcessor::changeProgramName (int index, const String& n
 //==============================================================================
 void OdReverseDelayAudioProcessor::prepareToPlay (double newSampleRate, int samplesPerBlock)
 {
+    sampleSize = samplesPerBlock;
     sampleRate=newSampleRate;
+    const int maxDelayBufferSize = sampleRate * maxDelayTimeSeconds;
     
+    delayBufferFloat.setSize(2, std::max(maxDelayBufferSize, sampleSize));
+    
+    /*
     if(delayBufferFloat.getNumSamples() < samplesPerBlock) {
         delayBufferFloat.setSize(2, samplesPerBlock);
     }
-    // this will go
-    delayBufferFloat.setSize(2, 131072);
+    */
+
+
 }
 
 void OdReverseDelayAudioProcessor::releaseResources()
@@ -159,11 +165,8 @@ void OdReverseDelayAudioProcessor::process (AudioBuffer<FloatType>& buffer, Midi
         dillateBuffer(delayBuffer, newDelayLengthSamples);
         
         // check this!
-        delayPosition *= (float)newDelayLengthSamples/(float)delayLengthSamples;
-        //delayPosition = 0;
-        /*delayPosition *= newDelayLengthSamples;
-        delayPosition /= delayLengthSamples;*/
-        delayLengthSamples = normalizedDelayLengthToSamples(normalizedDelayLength);
+        delayPosition *= newDelayLengthSamples/static_cast<float>(delayLengthSamples);
+        delayLengthSamples = newDelayLengthSamples;
     }
     applyDelay(buffer, delayBuffer);
 }
@@ -185,8 +188,9 @@ void OdReverseDelayAudioProcessor::dillateBuffer(AudioBuffer<FloatType>& buffer,
 
 template<typename FloatType>
 const int OdReverseDelayAudioProcessor::normalizedDelayLengthToSamples(const FloatType &normDelayLength) {
-    const FloatType maxDelaySeconds = 2.0;
-    return maxDelaySeconds * normDelayLength * sampleRate;
+    //const FloatType maxDelaySeconds = 2.0;
+    const int retval = maxDelayTimeSeconds * normDelayLength * sampleRate;
+    return std::max(retval, sampleSize);
 }
 
 template<typename FloatType>
