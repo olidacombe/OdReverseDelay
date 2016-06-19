@@ -175,16 +175,52 @@ template<typename FloatType>
 void OdReverseDelayAudioProcessor::dillateBuffer(AudioBuffer<FloatType>& buffer, const int newLength)
 {
     /*
+    M =
     My initial idea is, when scaling from N+1 samples to M+1 samples, a[] -> b[].
     b[0]=a[0], b[M+1]=a[N+1]
     and for 0<i<=M:
         b[i] =  { (iN % M)a[iN/M] + (M - (iN % M))a[iN/M + 1] } / M
+     
+        call j = iN/M
+             k = j+1
+             a[j]=A
+             a[j+1]=B
     */
     /*
     if(buffer.getNumSamples() < newLength) {
         buffer.setSize(buffer.getNumChannels(), exp2((int)log2(newLength) + 1), true);
     }
     */
+    
+    AudioBuffer<FloatType> a = AudioBuffer<FloatType>(buffer);
+    
+    const int M = newLength - 1;
+    const int N = delayLengthSamples - 1;
+    //const int NoverM = N/M;
+    const int numChannels = buffer.getNumChannels();
+    
+
+    for(int c=0; c<numChannels; c++) {
+        
+        int j=0;
+        int r=0;
+        int A = a.getSample(c, 0);
+        int B = a.getSample(c, 1);
+        
+        for(int i=1; i<=M; i++) {
+            r+=N;
+            if(r>=M) {
+                j+=N/M;
+                r%=M;
+                A = a.getSample(c, j);
+                B = a.getSample(c, j+1); // not sure, when 1 != N/M
+            }
+            int R=M-r;
+            
+            buffer.setSample(c, i, (r*A + R*B)/M);
+        }
+    }
+    
     
 }
 
