@@ -238,15 +238,14 @@ const int OdReverseDelayAudioProcessor::normalizedDelayLengthToSamples(const Flo
 template<typename FloatType>
 void OdReverseDelayAudioProcessor::applyDelay(AudioBuffer<FloatType>& buffer, AudioBuffer<FloatType>& delayBuffer)
 {
-    
     const int numSamples = buffer.getNumSamples();
     const float delayLevel = feedbackParameter->get();
     const int initialDelayPos = delayPosition;
-    // maybe we should smooth these parameters here
-    // 
+    // maybe we should smooth parameters used above
     
     const int delaySize = delayLengthSamples;
     int delayPos;
+    //int midzoneCounter = delaySize / 2 + midzoneRadius;
     
     for(int channel = 0; channel < getTotalNumInputChannels(); ++channel) {
         FloatType* const channelData = buffer.getWritePointer(channel);
@@ -255,8 +254,17 @@ void OdReverseDelayAudioProcessor::applyDelay(AudioBuffer<FloatType>& buffer, Au
         
         for(int i=0; i<numSamples; ++i) {
             const int delayAntiPos = delaySize - 1 - delayPos;
+            
+            /*
+            FloatType windowScaler = 1.0;
+            
+            if(midzoneCounter <= midzoneRadius*2) {
+                windowScaler *= abs(midzoneCounter - midzoneRadius) / midzoneRadius;
+            }
+            */
+            
             //const FloatType in = channelData[i];
-            delayData[delayAntiPos] = delayData[delayAntiPos] * delayLevel + channelData[i];
+            delayData[delayAntiPos] = delayData[delayAntiPos] * delayLevel + channelData[i]; //* windowScaler;
             channelData[i] += delayData[delayPos];
             //delayData[delayAntiPos] = (delayData[delayAntiPos] + channelData[i]) * delayLevel;
             //delayData[delayAntiPos] = (delayData[delayAntiPos] + in) * delayLevel;
@@ -264,6 +272,11 @@ void OdReverseDelayAudioProcessor::applyDelay(AudioBuffer<FloatType>& buffer, Au
             if (++delayPos >= delaySize) {
                 delayPos = 0;
             }
+            /*
+            if (++midzoneCounter >= delaySize ) {
+                midzoneCounter = 0;
+            }
+            */
         }
     }
     

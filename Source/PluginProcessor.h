@@ -93,6 +93,7 @@ private:
     AudioBuffer<float> delayBufferFloat;
     AudioBuffer<double> delayBufferDouble;
     
+    static const int midzoneRadius = 4;
     double sampleRate;
     int sampleSize;
     float normalizedDelayLength;
