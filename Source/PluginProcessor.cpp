@@ -17,7 +17,8 @@
 OdReverseDelayAudioProcessor::OdReverseDelayAudioProcessor()
     :   ctsDelayParameter(nullptr),
         feedbackParameter(nullptr),
-        delayLengthSamples(1)
+        delayLengthSamples(1),
+        delayPosition(0)
 {
     addParameter(ctsDelayParameter = new AudioParameterFloat("continuousDelay", "Continuous Delay Time", 0.0f, 1.0f, 0.5f));
     addParameter(feedbackParameter = new AudioParameterFloat("feedback", "Feedback", 0.0f, 1.0f, 0.4f));
@@ -142,8 +143,10 @@ void OdReverseDelayAudioProcessor::process (AudioBuffer<FloatType>& buffer, Midi
     // This is here to avoid people getting screaming feedback
     // when they first compile a plugin, but obviously you don't need to keep
     // this code if your algorithm always overwrites all the output channels.
+    
     for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
+    
 
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
@@ -192,32 +195,33 @@ void OdReverseDelayAudioProcessor::dillateBuffer(AudioBuffer<FloatType>& buffer,
     }
     */
     
-    AudioBuffer<FloatType> a = AudioBuffer<FloatType>(buffer);
+    AudioBuffer<FloatType> bufferCopy = AudioBuffer<FloatType>(buffer);
     
     const int M = newLength - 1;
     const int N = delayLengthSamples - 1;
     //const int NoverM = N/M;
     const int numChannels = buffer.getNumChannels();
     
-
-    for(int c=0; c<numChannels; c++) {
+    for(int channel=0; channel<numChannels; channel++) {
         
+        const FloatType* const a = bufferCopy.getReadPointer(channel);
+        FloatType* const b = buffer.getWritePointer(channel);
+    
         int j=0;
         int r=0;
-        int A = a.getSample(c, 0);
-        int B = a.getSample(c, 1);
+        FloatType A = a[0];
+        FloatType B = a[1];
         
         for(int i=1; i<=M; i++) {
             r+=N;
             if(r>=M) {
-                j+=N/M;
+                j+=r/M;
                 r%=M;
-                A = a.getSample(c, j);
-                B = a.getSample(c, j+1); // not sure, when 1 != N/M
+                A = a[j];
+                B = a[j+1]; // not sure, when 1 != N/M
             }
             int R=M-r;
-            
-            buffer.setSample(c, i, (r*A + R*B)/M);
+            b[i] = (R*A + r*B)/M;
         }
     }
     
